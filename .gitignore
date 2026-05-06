@@ -1,0 +1,12 @@
+# Python 缓存文件
+__pycache__/
+*.pyc
+*.pyo
+
+# 无关的练习文件夹
+learngit/
+
+# 系统/IDE 垃圾文件
+.DS_Store
+Thumbs.db
+.vscode/

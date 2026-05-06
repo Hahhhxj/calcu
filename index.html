@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>传统计算器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <input type="text" id="result" readonly value="0">
+        </div>
+        <div class="user-info">
+            <span id="user-status">未登录</span>
+            <button id="login-btn" onclick="openLoginModal()">登录</button>
+            <button id="register-btn" onclick="openRegisterModal()">注册</button>
+            <button id="logout-btn" onclick="logout()" style="display: none;">退出</button>
+        </div>
+        <div class="buttons">
+            <button class="red" onclick="clearDisplay()">C</button>
+            <button class="orange" onclick="appendOperator('/')">÷</button>
+            <button class="orange" onclick="appendOperator('*')">×</button>
+            <button class="red" onclick="backspace()">⌫</button>
+            <button class="gray" onclick="appendNumber('7')">7</button>
+            <button class="gray" onclick="appendNumber('8')">8</button>
+            <button class="gray" onclick="appendNumber('9')">9</button>
+            <button class="orange" onclick="appendOperator('-')">-</button>
+            <button class="gray" onclick="appendNumber('4')">4</button>
+            <button class="gray" onclick="appendNumber('5')">5</button>
+            <button class="gray" onclick="appendNumber('6')">6</button>
+            <button class="orange" onclick="appendOperator('+')">+</button>
+            <button class="gray" onclick="appendNumber('1')">1</button>
+            <button class="gray" onclick="appendNumber('2')">2</button>
+            <button class="gray" onclick="appendNumber('3')">3</button>
+            <button class="green" onclick="calculate()">=</button>
+            <button class="gray zero" onclick="appendNumber('0')">0</button>
+            <button class="gray" onclick="appendDecimal()">.</button>
+        </div>
+        <div class="info">
+            <p>支持两位数及以内加减乘除运算</p>
+            <p class="status">后端服务: 未连接</p>
+        </div>
+        <button class="history">查看历史记录</button>
+    </div>
+
+    <!-- 登录模态框 -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('login-modal')">&times;</span>
+            <h2>登录</h2>
+            <form onsubmit="handleLogin(event)">
+                <input type="text" id="login-username" placeholder="用户名" required>
+                <input type="password" id="login-password" placeholder="密码" required>
+                <button type="submit">登录</button>
+            </form>
+            <p id="login-message"></p>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('register-modal')">&times;</span>
+            <h2>注册</h2>
+            <form onsubmit="handleRegister(event)">
+                <input type="text" id="register-username" placeholder="用户名" required>
+                <input type="password" id="register-password" placeholder="密码" required>
+                <button type="submit">注册</button>
+            </form>
+            <p id="register-message"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
