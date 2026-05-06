@@ -23,6 +23,8 @@ body {
     margin-bottom: 15px;
     color: #95a5a6;
     font-size: 12px;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 
 .user-info button {
@@ -107,10 +109,47 @@ body {
 }
 
 #login-message,
-#register-message {
+#register-message,
+#vip-message {
     margin-top: 15px;
     text-align: center;
     color: #e74c3c;
+}
+
+/* VIP表单样式 */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.radio-label {
+    display: inline-block;
+    margin-right: 15px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    margin-right: 5px;
+    transform: scale(1.2);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2);
 }
 
 .display {
@@ -190,6 +229,11 @@ button:active {
 .status {
     color: #e74c3c;
     margin-top: 5px;
+}
+
+.vip-hint {
+    margin-top: 5px;
+    font-size: 11px;
 }
 
 .history {

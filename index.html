@@ -16,6 +16,7 @@
             <button id="login-btn" onclick="openLoginModal()">登录</button>
             <button id="register-btn" onclick="openRegisterModal()">注册</button>
             <button id="logout-btn" onclick="logout()" style="display: none;">退出</button>
+            <button id="vip-btn" onclick="openVipModal()" style="display: none;">升级VIP</button>
         </div>
         <div class="buttons">
             <button class="red" onclick="clearDisplay()">C</button>
@@ -40,6 +41,7 @@
         <div class="info">
             <p>支持两位数及以内加减乘除运算</p>
             <p class="status">后端服务: 未连接</p>
+            <p class="vip-hint" id="vip-hint"></p>
         </div>
         <button class="history">查看历史记录</button>
     </div>
@@ -69,6 +71,32 @@
                 <button type="submit">注册</button>
             </form>
             <p id="register-message"></p>
+        </div>
+    </div>
+
+    <!-- VIP注册模态框 -->
+    <div id="vip-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('vip-modal')">&times;</span>
+            <h2>注册VIP</h2>
+            <form onsubmit="handleVipRegister(event)">
+                <div class="form-group">
+                    <label>性别:</label>
+                    <label class="radio-label">
+                        <input type="radio" name="gender" value="男" required> 男
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="gender" value="女" required> 女
+                    </label>
+                </div>
+                <input type="tel" id="vip-phone" placeholder="手机号码" required>
+                <input type="date" id="vip-birthday" required>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="vip-agree" required> 我同意注册为VIP
+                </label>
+                <button type="submit">注册VIP</button>
+            </form>
+            <p id="vip-message"></p>
         </div>
     </div>
 

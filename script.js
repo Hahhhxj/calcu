@@ -5,6 +5,7 @@ let secondNumber = '';
 let isOperatorClicked = false;
 let isConnected = false;
 let currentUser = null;
+let isVip = false;
 
 function checkConnection() {
     fetch('http://localhost:5001/api/health')
@@ -54,13 +55,28 @@ function calculate() {
     if (firstNumber !== '' && operator !== '' && secondNumber !== '') {
         const expression = firstNumber + operator + secondNumber;
 
+        if ((operator === '*' || operator === '/') && !currentUser) {
+            alert('乘法和除法运算需要登录');
+            openLoginModal();
+            return;
+        }
+
+        if (operator === '/' && !isVip) {
+            alert('除法运算需要注册VIP');
+            openVipModal();
+            return;
+        }
+
         if (isConnected) {
             fetch('http://localhost:5001/api/calculate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ expression })
+                body: JSON.stringify({
+                    expression,
+                    user_id: currentUser ? currentUser.id : null
+                })
             })
             .then(response => response.json())
             .then(data => {
@@ -70,6 +86,13 @@ function calculate() {
                     secondNumber = '';
                     operator = '';
                     isOperatorClicked = false;
+                } else if (data.error) {
+                    alert(data.error);
+                    if (data.error.includes('需要登录')) {
+                        openLoginModal();
+                    } else if (data.error.includes('需要注册VIP')) {
+                        openVipModal();
+                    }
                 }
             })
             .catch(() => {
@@ -154,6 +177,16 @@ function openRegisterModal() {
     document.getElementById('register-message').textContent = '';
 }
 
+function openVipModal() {
+    if (!currentUser) {
+        alert('请先登录');
+        openLoginModal();
+        return;
+    }
+    document.getElementById('vip-modal').style.display = 'block';
+    document.getElementById('vip-message').textContent = '';
+}
+
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
@@ -174,6 +207,7 @@ function handleLogin(event) {
     .then(data => {
         if (data.user) {
             currentUser = data.user;
+            isVip = data.user.is_vip || false;
             updateUserStatus();
             closeModal('login-modal');
             alert('登录成功');
@@ -212,8 +246,67 @@ function handleRegister(event) {
     });
 }
 
+function handleVipRegister(event) {
+    event.preventDefault();
+    
+    const gender = document.querySelector('input[name="gender"]:checked')?.value;
+    const phone = document.getElementById('vip-phone').value;
+    const birthday = document.getElementById('vip-birthday').value;
+    const agree = document.getElementById('vip-agree').checked;
+
+    if (!gender) {
+        document.getElementById('vip-message').textContent = '请选择性别';
+        return;
+    }
+
+    if (!phone) {
+        document.getElementById('vip-message').textContent = '请填写手机号码';
+        return;
+    }
+
+    if (!birthday) {
+        document.getElementById('vip-message').textContent = '请选择生日';
+        return;
+    }
+
+    if (!agree) {
+        document.getElementById('vip-message').textContent = '请勾选同意注册VIP';
+        return;
+    }
+
+    fetch('http://localhost:5001/api/register_vip', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            user_id: currentUser.id,
+            gender: gender,
+            phone: phone,
+            birthday: birthday,
+            agree: agree
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'VIP注册成功') {
+            isVip = true;
+            currentUser.is_vip = true;
+            updateUserStatus();
+            closeModal('vip-modal');
+            alert('VIP注册成功！您现在可以使用除法运算了');
+        } else {
+            document.getElementById('vip-message').textContent = data.error || 'VIP注册失败';
+        }
+    })
+    .catch(() => {
+        document.getElementById('vip-message').textContent = 'VIP注册失败，请检查网络连接';
+    });
+}
+
 function logout() {
     currentUser = null;
+    isVip = false;
     updateUserStatus();
     alert('已退出登录');
 }
@@ -223,62 +316,31 @@ function updateUserStatus() {
     const loginBtn = document.getElementById('login-btn');
     const registerBtn = document.getElementById('register-btn');
     const logoutBtn = document.getElementById('logout-btn');
+    const vipBtn = document.getElementById('vip-btn');
+    const vipHint = document.getElementById('vip-hint');
 
     if (currentUser) {
-        userStatus.textContent = `已登录: ${currentUser.username}`;
+        if (isVip) {
+            userStatus.textContent = `已登录: ${currentUser.username} (VIP)`;
+            vipBtn.style.display = 'none';
+            vipHint.textContent = '您是VIP用户，可以使用除法运算';
+            vipHint.style.color = '#f39c12';
+        } else {
+            userStatus.textContent = `已登录: ${currentUser.username}`;
+            vipBtn.style.display = 'inline-block';
+            vipHint.textContent = '注册VIP可解锁除法运算功能';
+            vipHint.style.color = '#3498db';
+        }
         loginBtn.style.display = 'none';
         registerBtn.style.display = 'none';
         logoutBtn.style.display = 'inline-block';
     } else {
         userStatus.textContent = '未登录';
+        vipBtn.style.display = 'none';
+        vipHint.textContent = '';
         loginBtn.style.display = 'inline-block';
         registerBtn.style.display = 'inline-block';
         logoutBtn.style.display = 'none';
-    }
-}
-
-function calculate() {
-    if (firstNumber !== '' && operator !== '' && secondNumber !== '') {
-        const expression = firstNumber + operator + secondNumber;
-
-        if ((operator === '*' || operator === '/') && !currentUser) {
-            alert('乘法和除法运算需要登录');
-            openLoginModal();
-            return;
-        }
-
-        if (isConnected) {
-            fetch('http://localhost:5001/api/calculate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    expression,
-                    user_id: currentUser ? currentUser.id : null
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result !== undefined) {
-                    display.value = data.result;
-                    firstNumber = data.result.toString();
-                    secondNumber = '';
-                    operator = '';
-                    isOperatorClicked = false;
-                } else if (data.error) {
-                    alert(data.error);
-                    if (data.error.includes('需要登录')) {
-                        openLoginModal();
-                    }
-                }
-            })
-            .catch(() => {
-                localCalculate();
-            });
-        } else {
-            localCalculate();
-        }
     }
 }
 
@@ -323,10 +385,14 @@ document.querySelector('.history').addEventListener('click', showHistory);
 window.onclick = function(event) {
     const loginModal = document.getElementById('login-modal');
     const registerModal = document.getElementById('register-modal');
+    const vipModal = document.getElementById('vip-modal');
     if (event.target == loginModal) {
         loginModal.style.display = 'none';
     }
     if (event.target == registerModal) {
         registerModal.style.display = 'none';
+    }
+    if (event.target == vipModal) {
+        vipModal.style.display = 'none';
     }
 }
